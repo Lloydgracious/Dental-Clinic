@@ -27,3 +27,14 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Remove browser default print headers/footers (date, title, URL) */
+@page {
+  margin: 0;
+}
+
+@media print {
+  body {
+    padding: 20px;
+  }
+}
