@@ -26,7 +26,7 @@ export function Sidebar() {
 
   return (
     <>
-      <aside className="w-64 bg-white dark:bg-surface-dark border-r border-gray-100 dark:border-gray-800 flex flex-col h-full shrink-0 hidden md:flex transition-colors">
+      <aside className="print:hidden w-64 bg-white dark:bg-surface-dark border-r border-gray-100 dark:border-gray-800 flex flex-col h-full shrink-0 hidden md:flex transition-colors">
         <div className="p-6">
           <Link href="/">
              <div className="flex items-center gap-3 group cursor-pointer">

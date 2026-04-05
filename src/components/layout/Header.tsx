@@ -10,7 +10,7 @@ export function Header() {
   if (pathname === "/login" || !isAuthenticated) return null;
 
   return (
-    <header className="h-20 bg-white/80 dark:bg-surface-dark/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 flex items-center justify-between px-8 sticky top-0 z-40 transition-colors">
+    <header className="print:hidden h-20 bg-white/80 dark:bg-surface-dark/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 flex items-center justify-between px-8 sticky top-0 z-40 transition-colors">
       <div className="flex-1 max-w-md">
         <div className="relative group">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-accent-orange transition-colors" />

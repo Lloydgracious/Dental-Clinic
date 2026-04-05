@@ -19,12 +19,12 @@ export default function RootLayout({
       <head>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Myanmar:wght@400;500;700&display=swap" rel="stylesheet" />
       </head>
-      <body className="flex h-screen overflow-hidden text-accent-charcoal">
+      <body className="flex h-screen overflow-hidden text-accent-charcoal print:block print:h-auto print:overflow-visible print:bg-white">
         <Providers>
           <Sidebar />
-          <div className="flex-1 flex flex-col min-w-0 bg-[#F9FAFB]">
+          <div className="flex-1 flex flex-col min-w-0 bg-[#F9FAFB] print:block print:bg-white print:w-full">
             <Header />
-            <main className="flex-1 overflow-auto p-4 md:p-8 no-scrollbar relative">
+            <main className="flex-1 overflow-auto p-4 md:p-8 no-scrollbar relative print:p-0 print:overflow-visible print:block print:w-full w-full">
               {children}
             </main>
           </div>
