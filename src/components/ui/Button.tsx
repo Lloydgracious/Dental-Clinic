@@ -10,19 +10,19 @@ export interface ButtonProps extends HTMLMotionProps<"button"> {
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "primary", size = "md", ...props }, ref) => {
-    const baseStyle = "inline-flex items-center justify-center rounded-2xl font-medium transition-colors focus:outline-none focus:ring-4 relative overflow-hidden";
+    const baseStyle = "inline-flex items-center justify-center rounded-md font-semibold tracking-[0.01em] transition-colors focus:outline-none focus:ring-4 relative overflow-hidden disabled:opacity-60 disabled:cursor-not-allowed";
     
     const variants = {
-      primary: "bg-accent-primary text-white hover:bg-[#2B4CB3] focus:ring-accent-primary/20 shadow-lg",
-      secondary: "bg-surface-muted text-accent-charcoal hover:bg-gray-100 focus:ring-gray-200",
-      outline: "border-2 border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50 focus:ring-gray-100",
-      ghost: "text-gray-600 hover:text-accent-charcoal hover:bg-gray-100 focus:ring-gray-100",
+      primary: "bg-accent-primary text-white hover:bg-accent-strong focus:ring-accent-primary/25 shadow-[var(--shadow-soft)]",
+      secondary: "bg-surface-strong text-foreground hover:bg-border focus:ring-border/40",
+      outline: "border border-border bg-surface-light text-foreground hover:bg-surface-muted focus:ring-border/30",
+      ghost: "text-muted hover:text-foreground hover:bg-surface-muted focus:ring-border/30",
     };
 
     const sizes = {
-      sm: "h-9 px-4 text-sm",
-      md: "h-11 px-6 text-base",
-      lg: "h-14 px-8 text-lg",
+      sm: "h-9 px-3.5 text-sm",
+      md: "h-10 px-4.5 text-sm",
+      lg: "h-12 px-6 text-base",
     };
 
     return (

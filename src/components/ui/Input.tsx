@@ -15,7 +15,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="flex flex-col gap-1.5 w-full">
         {label && (
-          <label className="text-sm font-medium text-gray-600 ml-1">
+          <label className="text-xs font-semibold uppercase tracking-[0.12em] text-muted ml-1">
             {label}
           </label>
         )}
@@ -38,10 +38,10 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
               props.onBlur?.(e);
             }}
             className={cn(
-              "w-full bg-white border-2 rounded-2xl px-4 py-3 text-base text-accent-charcoal outline-none transition-all placeholder:text-gray-400 focus:ring-4",
+              "w-full bg-surface-light border rounded-md px-4 py-2.5 text-sm text-foreground outline-none transition-all placeholder:text-muted focus:ring-4",
               error 
                 ? "border-red-400 focus:border-red-500 focus:ring-red-500/10" 
-                : "border-gray-100 focus:border-accent-primary focus:ring-accent-primary/10 hover:border-gray-200",
+                : "border-border focus:border-accent-primary focus:ring-accent-primary/15 hover:border-[color:var(--border-strong)]",
               className
             )}
             {...props}

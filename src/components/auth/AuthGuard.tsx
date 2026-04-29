@@ -8,28 +8,37 @@ export const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children })
   const { isAuthenticated, isInitialLoading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const isLoginPage = pathname === "/login";
+  const shouldBlockForAuthCheck = isInitialLoading && !isLoginPage;
+  const needsLoginRedirect = !isInitialLoading && !isAuthenticated && !isLoginPage;
+  const needsHomeRedirect = !isInitialLoading && isAuthenticated && isLoginPage;
 
   useEffect(() => {
-    if (!isInitialLoading) {
-      if (!isAuthenticated && pathname !== "/login") {
-        router.push("/login");
-      } else if (isAuthenticated && pathname === "/login") {
-        router.push("/");
-      }
+    if (needsLoginRedirect) {
+      router.replace("/login");
+    } else if (needsHomeRedirect) {
+      router.replace("/");
     }
-  }, [isAuthenticated, isInitialLoading, pathname, router]);
+  }, [needsHomeRedirect, needsLoginRedirect, router]);
 
-  if (isInitialLoading) {
+  if (shouldBlockForAuthCheck || needsLoginRedirect || needsHomeRedirect) {
     return (
-      <div className="h-screen w-screen flex items-center justify-center bg-surface-light">
-        <div className="w-12 h-12 border-4 border-accent-orange border-t-transparent rounded-full animate-spin"></div>
+      <div className="flex min-h-screen w-full items-center justify-center bg-background px-6">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div className="h-12 w-12 rounded-full border-4 border-accent-primary border-t-transparent animate-spin"></div>
+          <div className="space-y-1">
+            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-accent-primary">
+              {shouldBlockForAuthCheck ? "Checking access" : "Redirecting"}
+            </p>
+            <p className="text-sm text-muted">
+              {shouldBlockForAuthCheck
+                ? "Loading your secure clinic workspace."
+                : "Taking you to the right page."}
+            </p>
+          </div>
+        </div>
       </div>
     );
-  }
-
-  // If not authenticated and not on login page, don't render children to avoid flash of content
-  if (!isAuthenticated && pathname !== "/login") {
-    return null;
   }
 
   return <>{children}</>;

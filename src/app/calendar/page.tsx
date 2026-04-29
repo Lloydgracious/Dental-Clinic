@@ -22,6 +22,12 @@ interface Appointment {
   dentalDiagnosis?: string;
 }
 
+interface Patient {
+  id: string;
+  firstName?: string;
+  lastName?: string;
+}
+
 export default function CalendarPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -39,6 +45,7 @@ export default function CalendarPage() {
   });
 
   const [doctors, setDoctors] = useState<any[]>([]);
+  const [patients, setPatients] = useState<Patient[]>([]);
 
   useEffect(() => {
     const q = query(collection(db, "appointments"), orderBy("time", "asc"));
@@ -59,9 +66,19 @@ export default function CalendarPage() {
       setDoctors(docData);
     });
 
+    const patientsQuery = query(collection(db, "patients"), orderBy("createdAt", "desc"));
+    const unsubscribePatients = onSnapshot(patientsQuery, (snapshot) => {
+      const patientData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Patient[];
+      setPatients(patientData);
+    });
+
     return () => {
       unsubscribe();
       unsubscribeDoctors();
+      unsubscribePatients();
     };
   }, []);
 
@@ -115,6 +132,13 @@ export default function CalendarPage() {
 
   // Lists
   const todaysAppointments = appointments.filter((a: Appointment) => a.date === todayStr);
+  const patientNameOptions = Array.from(
+    new Set(
+      patients
+        .map((patient) => `${patient.firstName || ""} ${patient.lastName || ""}`.trim())
+        .filter(Boolean)
+    )
+  ).sort((a, b) => a.localeCompare(b));
 
   // Show EVERYTHING in the future, smoothly animated
   const allFutureAppointments = appointments
@@ -139,18 +163,18 @@ export default function CalendarPage() {
   const selectedDateAppointments = selectedDate ? appointments.filter((a: Appointment) => a.date === selectedDate) : [];
 
   return (
-    <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="h-full flex flex-col space-y-8 max-w-7xl mx-auto pb-10">
+    <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="h-full flex flex-col space-y-6 md:space-y-8 max-w-7xl mx-auto pb-10">
       
       {/* Header */}
-      <div className="flex flex-col md:flex-row items-center justify-between shrink-0 gap-6">
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between shrink-0 gap-4 md:gap-6">
         <div>
-          <h1 className="text-4xl font-black text-accent-charcoal dark:text-white tracking-tight flex items-center gap-3">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-foreground tracking-tight flex items-center gap-3">
              <CalendarIcon className="w-8 h-8 text-accent-primary" /> Appointments
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1 font-medium">Your 3D interactive timeline and complete schedule.</p>
+          <p className="text-muted mt-1 font-medium">Your 3D interactive timeline and complete schedule.</p>
         </div>
         <Button 
-          className="gap-2 shadow-lg bg-gradient-to-r from-accent-primary to-blue-500 hover:scale-105 transition-transform px-6 h-12 rounded-2xl" 
+          className="gap-2 shadow-lg bg-accent-primary hover:bg-accent-strong hover:scale-105 transition-transform px-6 h-12 rounded-2xl w-full md:w-auto" 
           onClick={() => setIsModalOpen(true)}
         >
           <Plus className="w-5 h-5 text-white" />
@@ -160,16 +184,16 @@ export default function CalendarPage() {
 
       {/* 3D Mini Calendar Timeline */}
       <div className="relative">
-         <div className="flex items-center gap-3 mb-4">
-            <h2 className="text-xl font-black text-accent-charcoal dark:text-white">3D Mini Calendar Timeline</h2>
-            <span className="bg-blue-100 dark:bg-blue-950/30 text-accent-primary text-xs font-bold px-3 py-1 rounded-full">Next 30 Days</span>
+         <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+            <h2 className="text-lg sm:text-xl font-black text-foreground">3D Mini Calendar Timeline</h2>
+            <span className="bg-surface-muted text-accent-primary text-xs font-bold px-3 py-1 rounded-full border border-border">Next 30 Days</span>
          </div>
          
          {/* Gradient Fades for scrolling */}
          <div className="absolute left-0 top-10 bottom-0 w-8 bg-gradient-to-r from-surface-light dark:from-background to-transparent z-10 pointer-events-none"></div>
          <div className="absolute right-0 top-10 bottom-0 w-12 bg-gradient-to-l from-surface-light dark:from-background to-transparent z-10 pointer-events-none"></div>
 
-         <div className="flex gap-4 perspective-1000 overflow-x-auto pt-6 pb-10 px-4 no-scrollbar items-end" style={{ perspective: 1500 }}>
+         <div className="flex gap-3 sm:gap-4 perspective-1000 overflow-x-auto pt-4 sm:pt-6 pb-8 sm:pb-10 px-2 sm:px-4 no-scrollbar items-end" style={{ perspective: 1500 }}>
             {timelineDays.map((day, i) => {
                const isToday = i === 0;
                return (
@@ -190,7 +214,7 @@ export default function CalendarPage() {
                    }}
                    onClick={() => setSelectedDate(day.dateStr)}
                    className={`
-                      min-w-[110px] sm:min-w-[130px] flex flex-col items-center p-5 rounded-3xl shrink-0 cursor-pointer transform-style-3d relative 
+                      min-w-[96px] sm:min-w-[120px] flex flex-col items-center p-4 sm:p-5 rounded-3xl shrink-0 cursor-pointer transform-style-3d relative 
                       transition-colors duration-200 border border-white/40 dark:border-gray-800
                       ${isToday 
                          ? "bg-gradient-to-br from-accent-charcoal to-gray-800 text-white shadow-[0_10px_20px_rgba(0,0,0,0.15)]" 
@@ -203,7 +227,7 @@ export default function CalendarPage() {
                    <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${isToday ? "text-gray-400" : (day.dayName === 'Sun' || day.dayName === 'Sat') ? "text-accent-primary/70" : "text-gray-400"}`}>
                       {day.monthName} {day.dayName}
                    </p>
-                   <p className="text-4xl font-black mb-4 tracking-tighter">{day.dayNum}</p>
+                   <p className="text-3xl sm:text-4xl font-black mb-3 sm:mb-4 tracking-tighter">{day.dayNum}</p>
                    
                    <div className="w-full h-px bg-current opacity-10 mb-3"></div>
                    
@@ -221,13 +245,13 @@ export default function CalendarPage() {
          </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pb-6 pt-4">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 md:gap-8 pb-6 pt-2 md:pt-4">
          {/* Today Column */}
-         <div className="flex flex-col h-[600px] bg-white dark:bg-surface-dark/40 dark:backdrop-blur-md rounded-3xl p-6 border border-white dark:border-gray-800 shadow-xl relative overflow-hidden">
+         <div className="flex flex-col min-h-[420px] xl:h-[600px] bg-white dark:bg-surface-dark/40 dark:backdrop-blur-md rounded-3xl p-4 sm:p-6 border border-white dark:border-gray-800 shadow-xl relative overflow-hidden">
             {/* Soft decorative background */}
             <div className="absolute top-0 right-0 w-48 h-48 bg-blue-100/50 dark:bg-blue-500/5 rounded-full blur-[60px] pointer-events-none"></div>
             
-            <h2 className="text-2xl font-black text-accent-charcoal dark:text-white mb-6 flex items-center gap-3 relative z-10">
+            <h2 className="text-xl sm:text-2xl font-black text-accent-charcoal dark:text-white mb-4 sm:mb-6 flex items-center gap-3 relative z-10">
               <span className="w-10 h-10 rounded-2xl bg-gradient-to-br from-accent-primary to-blue-300 text-white flex items-center justify-center shadow-lg transform -rotate-6">
                 <Clock className="w-5 h-5" />
               </span>
@@ -235,14 +259,14 @@ export default function CalendarPage() {
             </h2>
             <div className="space-y-4 flex-1 overflow-y-auto pr-2 no-scrollbar relative z-10">
                {todaysAppointments.length === 0 ? (
-                 <div className="p-10 text-center rounded-3xl border-2 border-dashed border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/20">
+                 <div className="p-6 sm:p-10 text-center rounded-3xl border-2 border-dashed border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/20">
                     <div className="w-16 h-16 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">🌿</div>
                     <p className="font-black text-xl text-gray-400 mb-1">Free day!</p>
                     <p className="text-gray-400 text-sm">No appointments left for today.</p>
                  </div>
                ) : todaysAppointments.map(apt => (
-                 <motion.div initial={{opacity:0, x:-20}} animate={{opacity:1, x:0}} key={apt.id} className={`p-5 rounded-2xl flex items-center justify-between group transition-all relative overflow-hidden shadow-sm ${apt.isEmergency && apt.status === 'Pending' ? "bg-red-50 dark:bg-red-950/20 hover:bg-red-100 dark:hover:bg-red-900/30 border border-red-100 dark:border-red-900/50" : "bg-white dark:bg-surface-dark border border-gray-100/50 dark:border-gray-800 hover:border-blue-100 dark:hover:border-blue-900 hover:shadow-[0_8px_20px_rgba(65,105,225,0.05)]"}`}>
-                    <div className="flex gap-4 items-center">
+                 <motion.div initial={{opacity:0, x:-20}} animate={{opacity:1, x:0}} key={apt.id} className={`p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 group transition-all relative overflow-hidden shadow-sm ${apt.isEmergency && apt.status === 'Pending' ? "bg-red-50 dark:bg-red-950/20 hover:bg-red-100 dark:hover:bg-red-900/30 border border-red-100 dark:border-red-900/50" : "bg-white dark:bg-surface-dark border border-gray-100/50 dark:border-gray-800 hover:border-blue-100 dark:hover:border-blue-900 hover:shadow-[0_8px_20px_rgba(65,105,225,0.05)]"}`}>
+                    <div className="flex gap-3 sm:gap-4 items-center">
                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black text-sm shrink-0 shadow-sm ${apt.isEmergency && apt.status==='Pending' ? "bg-red-500 text-white" : "bg-gray-50 dark:bg-gray-900 text-accent-charcoal dark:text-white border border-gray-200 dark:border-gray-800"}`}>
                          {apt.time}
                        </div>
@@ -262,12 +286,12 @@ export default function CalendarPage() {
                           )}
                        </div>
                     </div>
-                    <div className="flex flex-col items-end gap-2">
+                    <div className="flex flex-row sm:flex-col items-start sm:items-end justify-between gap-2">
                        <span className={`text-[10px] uppercase tracking-wider font-bold px-3 py-1 rounded-lg shadow-sm ${apt.status === "Completed" ? "bg-emerald-400 text-white" : "bg-gray-100 dark:bg-gray-800 text-gray-500"}`}>
                          {apt.status}
                        </span>
                     </div>
-                    <div className="absolute right-3 opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm px-2 py-1.5 rounded-xl shadow-lg flex items-center gap-2 border border-gray-100 dark:border-gray-700">
+                    <div className="sm:absolute sm:right-3 mt-1 sm:mt-0 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm px-2 py-1.5 rounded-xl shadow-lg flex items-center gap-2 border border-gray-100 dark:border-gray-700 self-end">
                       {apt.status === "Pending" && (
                         <button onClick={() => markComplete(apt.id)} className="w-9 h-9 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-colors" title="Mark Completed">
                           ✓
@@ -283,8 +307,8 @@ export default function CalendarPage() {
          </div>
 
          {/* All Future Appointments */}
-         <div className="flex flex-col h-[600px] bg-white dark:bg-surface-dark/40 dark:backdrop-blur-md rounded-3xl p-6 border border-white dark:border-gray-800 shadow-xl relative overflow-hidden">
-            <h2 className="text-2xl font-black text-accent-charcoal dark:text-white mb-6 flex items-center gap-3 relative z-10">
+         <div className="flex flex-col min-h-[420px] xl:h-[600px] bg-white dark:bg-surface-dark/40 dark:backdrop-blur-md rounded-3xl p-4 sm:p-6 border border-white dark:border-gray-800 shadow-xl relative overflow-hidden">
+            <h2 className="text-xl sm:text-2xl font-black text-accent-charcoal dark:text-white mb-4 sm:mb-6 flex items-center gap-3 relative z-10">
               <span className="w-10 h-10 rounded-2xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 flex items-center justify-center transform rotate-6">
                 <CalendarDays className="w-5 h-5" />
               </span>
@@ -292,12 +316,12 @@ export default function CalendarPage() {
             </h2>
             <div className="space-y-4 flex-1 overflow-y-auto pr-2 no-scrollbar relative z-10">
                {allFutureAppointments.length === 0 ? (
-                 <div className="p-10 text-center rounded-3xl border-2 border-dashed border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/20">
+                 <div className="p-6 sm:p-10 text-center rounded-3xl border-2 border-dashed border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/20">
                     <p className="font-black text-xl text-gray-400 mb-1">All clear!</p>
                     <p className="text-gray-400 text-sm">No future appointments scheduled.</p>
                  </div>
                ) : allFutureAppointments.map(apt => (
-                 <motion.div initial={{opacity:0, x:20}} animate={{opacity:1, x:0}} key={apt.id} className={`p-4 rounded-2xl flex items-center justify-between group transition-all relative overflow-hidden border border-gray-100/40 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-md ${apt.isEmergency && apt.status === 'Pending' ? "bg-red-50 dark:bg-red-950/20 border-red-100 dark:border-red-900/50" : "bg-gray-50/50 dark:bg-surface-dark/10"}`}>
+                 <motion.div initial={{opacity:0, x:20}} animate={{opacity:1, x:0}} key={apt.id} className={`p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 group transition-all relative overflow-hidden border border-gray-100/40 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-md ${apt.isEmergency && apt.status === 'Pending' ? "bg-red-50 dark:bg-red-950/20 border-red-100 dark:border-red-900/50" : "bg-gray-50/50 dark:bg-surface-dark/10"}`}>
                     <div className="flex gap-4 items-center">
                        <div className="flex flex-col items-center justify-center shrink-0 w-16 bg-white dark:bg-gray-800 rounded-xl py-2 shadow-sm border border-gray-100 dark:border-gray-700">
                          <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">{new Date(apt.date).toLocaleString('en-US', { weekday: 'short' })}</span>
@@ -316,7 +340,7 @@ export default function CalendarPage() {
                          </div>
                        </div>
                     </div>
-                    <div className="absolute right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 backdrop-blur-md p-1 rounded-xl shadow-lg border border-gray-100">
+                    <div className="sm:absolute sm:right-4 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 backdrop-blur-md p-1 rounded-xl shadow-lg border border-gray-100 self-end">
                       <button onClick={() => handleDelete(apt.id)} className="w-10 h-10 bg-red-50 text-red-500 rounded-lg flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors" title="Delete Appointment">
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -365,7 +389,22 @@ export default function CalendarPage() {
       {/* New Appointment Modal */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="New Appointment">
         <div className="space-y-4">
-          <Input label="Patient Name (လူနာအမည်)" name="name" value={formData.name} onChange={handleChange} placeholder="e.g. Aung Aung" />
+          <div className="flex flex-col gap-1.5 focus-within:z-10">
+            <label className="text-sm font-medium text-gray-600 ml-1">Patient Name (လူနာအမည်)</label>
+            <input
+              list="patient-options"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Select or type your own..."
+              className="w-full bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-2xl px-4 py-3 text-base font-bold text-accent-charcoal dark:text-white outline-none focus:border-accent-primary transition-colors"
+            />
+            <datalist id="patient-options">
+              {patientNameOptions.map((patientName) => (
+                <option key={patientName} value={patientName} />
+              ))}
+            </datalist>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input label="Date" name="date" type="date" value={formData.date} onChange={handleChange} />
             <Input label="Time" name="time" type="time" value={formData.time} onChange={handleChange} />
@@ -398,11 +437,20 @@ export default function CalendarPage() {
                className="w-full bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-2xl px-4 py-3 text-base font-bold text-accent-charcoal dark:text-white outline-none focus:border-accent-primary transition-colors"
             />
             <datalist id="treatment-options">
-              <option value="Checkup (စစ်ဆေးခြင်း)" />
-              <option value="Tooth Extraction (သွားနှုတ်ခြင်း)" />
-              <option value="Whitening (သွားဖြူခြင်း)" />
-              <option value="Root Canal (အကြောထုတ်ခြင်း)" />
-              <option value="Braces (သွားတု/ကြိုးတပ်ခြင်း)" />
+              <option value="Check Up And Consultation (သွားနှင့်ခံတွင်း စစ်ဆေးခြင်းနှင့် ဆွေးနွေးတိုင်ပင်ခြင်း)" />
+              <option value="Dental Implant (သွားအမြစ်တုအစားထိုးစိုက်ခြင်း)" />
+              <option value="Invisalign Treatment (Invisalign ဖြင့် သွားညှိကုသခြင်း)" />
+              <option value="Tooth Filling (သွားဖာခြင်း)" />
+              <option value="Tooth Extraction (သွားနုတ်ခြင်း)" />
+              <option value="Dental Prosthesis (သွားစိုက်ခြင်း)" />
+              <option value="Scaling And Polishing (သွားကျောက်ခြစ်ခြင်း)" />
+              <option value="Skyce (သွားစိန်ကပ်ခြင်း)" />
+              <option value="Whitening Treatment (သွားများဖြူဖွေးစေခြင်း)" />
+              <option value="Direct Veneer, Indirect Veneer (သွားကြွေလွှာကပ်ခြင်း)" />
+              <option value="Root Canal Treatment (သွားအကြောသတ်ကုသခြင်း)" />
+              <option value="Orthodontic Treatment (သွားညှိခြင်း)" />
+              <option value="Dental Periodontal Surgery (သွားဖုံးများအား ညီညာလှပစေရန် ပြုပြင်ခြင်း)" />
+              <option value="Full Mouth Rehabilitation (ခံတွင်းတစ်ခုလုံး ပြန်လည်ပြုပြင်ကုသမှု)" />
             </datalist>
           </div>
           

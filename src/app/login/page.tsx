@@ -7,8 +7,6 @@ import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Lock, ShieldCheck, AlertCircle, KeyRound } from "lucide-react";
 
-import Link from "next/link";
-
 export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
@@ -31,10 +29,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-surface-light flex items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen w-full bg-background flex items-center justify-center p-6 relative overflow-hidden">
       {/* Dynamic 3D Background Elements */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-accent-orange/5 rounded-full blur-[100px] -z-10 animate-pulse"></div>
-      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-amber-300/5 rounded-full blur-[100px] -z-10"></div>
+      <div className="absolute top-0 right-0 w-[420px] h-[420px] bg-accent-primary/12 rounded-full blur-[90px] -z-10"></div>
+      <div className="absolute bottom-0 left-0 w-[520px] h-[520px] bg-surface-strong rounded-full blur-[120px] -z-10"></div>
 
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -42,7 +40,7 @@ export default function LoginPage() {
         transition={{ duration: 0.8, type: "spring" }}
         className="max-w-md w-full"
       >
-        <div className="bg-white/80 backdrop-blur-2xl border border-white p-10 rounded-[3rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] relative">
+        <div className="bg-surface-light border border-border p-10 rounded-[3rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.18)] relative">
           
           {/* Lock Icon Animation */}
           <div className="flex justify-center mb-8">
@@ -52,16 +50,16 @@ export default function LoginPage() {
               transition={{ repeat: Infinity, repeatType: "mirror", duration: 2 }}
               className="w-20 h-20 bg-gradient-to-tr from-accent-charcoal to-gray-800 rounded-3xl flex items-center justify-center shadow-2xl relative"
             >
-              <KeyRound className="w-10 h-10 text-accent-orange" />
-              <div className="absolute -top-2 -right-2 bg-accent-orange w-6 h-6 rounded-full flex items-center justify-center shadow-lg">
+              <KeyRound className="w-10 h-10 text-white" />
+              <div className="absolute -top-2 -right-2 bg-accent-primary w-6 h-6 rounded-full flex items-center justify-center shadow-lg">
                 <Lock className="w-3 h-3 text-white" />
               </div>
             </motion.div>
           </div>
 
           <div className="text-center mb-10">
-            <h1 className="text-3xl font-black text-accent-charcoal tracking-tight">Clinic Secure Access</h1>
-            <p className="text-gray-500 mt-2 font-medium">Please enter the master password to unlock the Lumiere Management System.</p>
+            <h1 className="text-3xl font-black text-foreground tracking-tight">Clinic Secure Access</h1>
+            <p className="text-muted mt-2 font-medium">Please enter the master password to unlock the Lumiere Management System.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -76,11 +74,11 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
                   className={`h-16 text-xl tracking-[0.5em] text-center font-black rounded-2xl border-2 transition-all ${
-                    error ? "border-red-500 bg-red-50" : "border-gray-100 group-focus-within:border-accent-orange"
+                    error ? "border-red-500 bg-red-50" : "border-border group-focus-within:border-accent-primary"
                   }`}
                   autoFocus
                 />
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-accent-orange transition-colors">
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-muted group-focus-within:text-accent-primary transition-colors">
                   <ShieldCheck className="w-6 h-6" />
                 </div>
               </div>
@@ -103,13 +101,13 @@ export default function LoginPage() {
             <Button
               type="submit"
               disabled={isLoading}
-              className={`w-full h-16 rounded-2xl bg-gradient-to-r from-accent-orange to-amber-500 hover:scale-[1.02] active:scale-95 transition-all shadow-glow text-white font-black text-lg ${isLoading ? "opacity-70 cursor-not-allowed" : ""}`}
+              className={`w-full h-16 rounded-2xl bg-accent-primary hover:bg-accent-strong active:scale-95 transition-all text-white font-black text-lg ${isLoading ? "opacity-70 cursor-not-allowed" : ""}`}
             >
               {isLoading ? "Verifying..." : "Unlock Application"}
             </Button>
           </form>
 
-          <p className="text-center text-xs text-gray-400 mt-10 font-bold uppercase tracking-widest">
+          <p className="text-center text-xs text-muted mt-10 font-bold uppercase tracking-widest">
             Protected by Lumiere Security Layer
           </p>
         </div>
@@ -121,13 +119,10 @@ export default function LoginPage() {
           transition={{ delay: 1 }}
           className="mt-8 text-center space-y-4"
         >
-          <p className="text-gray-500 text-sm font-medium">
-            New staff member?{" "}
-            <Link href="/register" className="text-accent-orange font-bold hover:underline">
-              Create an account
-            </Link>
+          <p className="text-muted text-sm font-medium">
+            New staff member? Ask the system administrator to create access for you.
           </p>
-          <div className="text-gray-400 text-xs font-medium">
+          <div className="text-muted text-xs font-medium">
             Forgot password? Contact your system administrator.
           </div>
         </motion.div>

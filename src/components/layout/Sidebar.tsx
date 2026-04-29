@@ -26,8 +26,8 @@ export function Sidebar() {
 
   return (
     <>
-      <aside className="print:hidden w-64 bg-white dark:bg-surface-dark border-r border-gray-100 dark:border-gray-800 flex flex-col h-full shrink-0 hidden md:flex transition-colors">
-        <div className="p-6">
+      <aside className="print:hidden w-64 bg-surface-light border-r border-border flex flex-col h-full shrink-0 hidden md:flex transition-colors">
+        <div className="p-6 border-b border-border">
           <Link href="/">
              <div className="flex items-center gap-3 group cursor-pointer">
                <img 
@@ -38,22 +38,22 @@ export function Sidebar() {
              </div>
           </Link>
         </div>
-        <nav className="flex-1 px-4 space-y-2 mt-4">
+        <nav className="flex-1 px-4 py-4 space-y-1.5">
           {SIDEBAR_ITEMS.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
             return (
               <Link key={item.name} href={item.href}>
                 <div className={cn(
-                  "relative py-3 px-4 rounded-2xl flex items-center gap-3 transition-colors cursor-pointer",
+                  "relative py-3 px-4 rounded-md flex items-center gap-3 transition-colors cursor-pointer border border-transparent",
                   isActive 
                     ? "text-accent-primary font-bold" 
-                    : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800/50",
+                    : "text-muted hover:text-foreground hover:bg-surface-muted",
                 )}>
                   {isActive && (
                     <motion.div 
                       layoutId="sidebar-bg"
-                      className="absolute inset-0 bg-blue-50 dark:bg-blue-950/20 rounded-2xl"
+                      className="absolute inset-0 bg-surface-muted rounded-md border border-accent-primary/20"
                       initial={false}
                       transition={{ type: "spring", stiffness: 300, damping: 30 }}
                     />
@@ -68,13 +68,33 @@ export function Sidebar() {
         <div className="p-4">
           <button 
             onClick={() => setIsSettingsOpen(true)}
-            className="w-full py-3 px-4 rounded-2xl flex items-center gap-3 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800/50 transition-all font-bold"
+            className="w-full py-3 px-4 rounded-md flex items-center gap-3 text-muted hover:text-foreground hover:bg-surface-muted transition-all font-bold"
           >
             <Settings className="w-5 h-5" />
             <span>Settings</span>
           </button>
         </div>
       </aside>
+
+      <nav className="print:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-surface-light px-2 py-2 md:hidden">
+        <div className="grid grid-cols-5 gap-1">
+          {SIDEBAR_ITEMS.map((item) => {
+            const isActive = pathname === item.href;
+            const Icon = item.icon;
+            return (
+              <Link key={item.name} href={item.href}>
+                <div className={cn(
+                  "flex flex-col items-center justify-center gap-1 rounded-md px-2 py-2 text-[11px] font-semibold transition-colors",
+                  isActive ? "bg-surface-muted text-accent-primary" : "text-muted"
+                )}>
+                  <Icon className="h-4 w-4" />
+                  <span className="leading-none">{item.name}</span>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
 
       <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </>

@@ -12,15 +12,20 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        border: "var(--border)",
+        muted: "var(--muted)",
         accent: {
-          primary: "#4169E1",
+          primary: "var(--primary)",
+          strong: "var(--primary-strong)",
           charcoal: "#1F2937",
+          orange: "var(--primary)",
         },
         surface: {
-          light: "#FFFFFF",
-          muted: "#F9FAFB",
-          dark: "#121212",
-          card: "#1E1E1E",
+          light: "var(--surface)",
+          muted: "var(--surface-alt)",
+          strong: "var(--surface-strong)",
+          dark: "var(--surface)",
+          card: "var(--surface)",
         }
       },
       boxShadow: {

@@ -72,19 +72,19 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="bg-white dark:bg-surface-dark w-full max-w-md rounded-[2.5rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.15)] overflow-hidden relative border border-white dark:border-gray-800"
+            className="bg-surface-light w-full max-w-md rounded-[2.5rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.2)] overflow-hidden relative border border-border"
           >
             {/* Header */}
             <div className="p-8 pb-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                 <div className="w-10 h-10 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center animate-pulse">
-                    <SettingsIcon className="w-5 h-5 text-accent-charcoal dark:text-white" />
+                 <div className="w-10 h-10 rounded-2xl bg-surface-muted flex items-center justify-center">
+                    <SettingsIcon className="w-5 h-5 text-foreground" />
                  </div>
-                 <h2 className="text-2xl font-black text-accent-charcoal dark:text-white">Settings</h2>
+                 <h2 className="text-2xl font-black text-foreground">Settings</h2>
               </div>
               <button 
                 onClick={onClose}
-                className="p-3 rounded-2xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-400"
+                className="p-3 rounded-2xl hover:bg-surface-muted transition-colors text-muted"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -93,7 +93,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             <div className="p-8 pt-2 space-y-8">
               {/* Theme Selection */}
               <div>
-                <label className="text-xs font-black uppercase tracking-widest text-gray-400 mb-4 block">Appearance (အပြင်အဆင်)</label>
+                <label className="text-xs font-black uppercase tracking-widest text-muted mb-4 block">Appearance (အပြင်အဆင်)</label>
                 <div className="grid grid-cols-2 gap-3">
                   {[
                     { id: "system", name: "Light / Default", icon: Sun },
@@ -105,8 +105,8 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                       className={`
                         flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all
                         ${(theme === t.id || (t.id === 'system' && theme === 'light')) 
-                          ? "border-accent-orange bg-orange-50 dark:bg-orange-950/20 text-accent-orange" 
-                          : "border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 text-gray-500"
+                          ? "border-accent-primary bg-surface-muted text-accent-primary" 
+                          : "border-border hover:border-accent-primary/30 text-muted"
                         }
                       `}
                     >
@@ -119,22 +119,22 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
               {/* Security & Access */}
               <div>
-                <label className="text-xs font-black uppercase tracking-widest text-gray-400 mb-4 block">Security & Access (လုံခြုံရေး)</label>
-                <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-3xl border border-gray-100 dark:border-gray-800 space-y-4">
+                <label className="text-xs font-black uppercase tracking-widest text-muted mb-4 block">Security & Access (လုံခြုံရေး)</label>
+                <div className="bg-surface-muted p-4 rounded-3xl border border-border space-y-4">
                     {!showPasswordForm ? (
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-xl bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-accent-orange">
+                            <div className="w-10 h-10 rounded-xl bg-accent-primary/12 flex items-center justify-center text-accent-primary">
                                 <KeyRound className="w-5 h-5" />
                             </div>
                             <div>
-                                <p className="font-bold text-accent-charcoal dark:text-white">Master Password</p>
-                                <p className="text-xs text-gray-500 font-medium">Protect clinic data</p>
+                                <p className="font-bold text-foreground">Master Password</p>
+                                <p className="text-xs text-muted font-medium">Protect clinic data</p>
                             </div>
                         </div>
                         <button 
                           onClick={() => setShowPasswordForm(true)}
-                          className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-xs font-bold text-accent-charcoal dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                          className="px-4 py-2 bg-surface-light border border-border rounded-xl text-xs font-bold text-foreground hover:bg-surface-strong transition-colors"
                         >
                           Change
                         </button>
@@ -146,7 +146,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                           placeholder="Current Password" 
                           value={oldPass}
                           onChange={(e) => setOldPass(e.target.value)}
-                          className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-sm outline-none focus:border-accent-orange dark:text-white"
+                          className="w-full bg-surface-light border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-accent-primary text-foreground"
                           required
                         />
                         <input 
@@ -154,7 +154,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                           placeholder="New Password" 
                           value={newPass}
                           onChange={(e) => setNewPass(e.target.value)}
-                          className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-sm outline-none focus:border-accent-orange dark:text-white"
+                          className="w-full bg-surface-light border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-accent-primary text-foreground"
                           required
                         />
                         <input 
@@ -162,17 +162,17 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                           placeholder="Confirm New Password" 
                           value={confirmPass}
                           onChange={(e) => setConfirmPass(e.target.value)}
-                          className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-sm outline-none focus:border-accent-orange dark:text-white"
+                          className="w-full bg-surface-light border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-accent-primary text-foreground"
                           required
                         />
                         {error && <p className="text-xs text-red-500 font-bold flex items-center gap-1"><AlertCircle className="w-3 h-3" /> {error}</p>}
                         {success && <p className="text-xs text-green-500 font-bold flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> {success}</p>}
                         <div className="flex gap-2">
-                          <button type="button" onClick={() => setShowPasswordForm(false)} className="flex-1 py-3 text-xs font-bold text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors">Cancel</button>
+                          <button type="button" onClick={() => setShowPasswordForm(false)} className="flex-1 py-3 text-xs font-bold text-muted hover:bg-surface-strong rounded-xl transition-colors">Cancel</button>
                           <button 
                             type="submit" 
                             disabled={isUpdating}
-                            className={`flex-1 py-3 bg-accent-orange text-white text-xs font-bold rounded-xl shadow-lg shadow-accent-orange/20 hover:bg-accent-orange/90 transition-colors ${isUpdating ? "opacity-70 cursor-not-allowed" : ""}`}
+                            className={`flex-1 py-3 bg-accent-primary text-white text-xs font-bold rounded-xl shadow-lg shadow-accent-primary/20 hover:bg-accent-strong transition-colors ${isUpdating ? "opacity-70 cursor-not-allowed" : ""}`}
                           >
                             {isUpdating ? "Updating..." : "Update Password"}
                           </button>
@@ -180,7 +180,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                       </form>
                     )}
 
-                    <div className="h-px bg-gray-100 dark:bg-gray-800" />
+                    <div className="h-px bg-border" />
 
                     <button 
                       onClick={() => { logout(); onClose(); }}
@@ -194,7 +194,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
               {/* Version Info */}
               <div className="text-center pb-2">
-                 <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Lumiere v1.0.4 - Premium Dental UI</p>
+                 <p className="text-[10px] font-black text-muted uppercase tracking-widest">Lumiere v1.0.4 - Premium Dental UI</p>
               </div>
             </div>
           </motion.div>

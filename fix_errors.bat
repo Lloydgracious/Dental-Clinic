@@ -1,19 +1,19 @@
 @echo off
 echo ==================================================
-echo      LUMIERE DENTAL - FIREBASE FIX SCRIPT
+echo      LUMIERE DENTAL - RESET & REBUILD SCRIPT
 echo ==================================================
 echo.
-echo This script will install the missing "firebase" package 
-echo to fix the "Module not found" error.
+echo This script clears the local Next.js build cache and
+echo refreshes dependencies to fix blank screens and stale builds.
 echo.
-echo 1. Installing Firebase...
-npm install firebase
+echo 1. Clearing the .next cache...
+call npm run clean
 echo.
-echo 2. Finalizing installation...
-npm install
+echo 2. Refreshing dependencies...
+call npm install
 echo.
 echo.
 echo ==================================================
-echo DONE! Now you can run: npm run dev
+echo DONE! Start the app again with: npm run dev
 echo ==================================================
 pause

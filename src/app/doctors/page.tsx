@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { UserPlus, Search, Trash2, Stethoscope } from "lucide-react";
+import { UserPlus, Trash2, Stethoscope } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { collection, addDoc, onSnapshot, query, orderBy, Timestamp, deleteDoc, doc } from "firebase/firestore";
 
@@ -53,8 +53,8 @@ export default function DoctorsPage() {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-5xl mx-auto space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-accent-charcoal">Doctors</h1>
-          <p className="text-gray-500 mt-1">Manage your clinic's medical staff.</p>
+          <h1 className="text-3xl font-bold text-foreground">Doctors</h1>
+          <p className="text-muted mt-1">Manage your clinic's medical staff.</p>
         </div>
         <Button onClick={() => setIsAdding(!isAdding)} className="gap-2">
           <UserPlus className="w-4 h-4" />
@@ -88,27 +88,27 @@ export default function DoctorsPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-gray-50/50 dark:bg-gray-900/10 border-b border-gray-100 dark:border-gray-800 text-sm text-gray-500">
+              <tr className="bg-surface-muted border-b border-border text-sm text-muted">
                 <th className="py-4 px-6 font-medium">Doctor Name</th>
                 <th className="py-4 px-6 font-medium">Specialization</th>
                 <th className="py-4 px-6 font-medium text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50 dark:divide-gray-800 bg-white dark:bg-surface-dark/10 text-sm">
+            <tbody className="divide-y divide-border bg-surface-light text-sm">
               {doctors.length === 0 ? (
                 <tr><td colSpan={3} className="py-8 text-center text-gray-500">No doctors registered yet.</td></tr>
               ) : doctors.map((doctor) => (
-                <tr key={doctor.id} className="hover:bg-gray-50/50 transition-colors group">
+                <tr key={doctor.id} className="hover:bg-surface-muted transition-colors group">
                   <td className="py-4 px-6">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-accent-primary/10 flex items-center justify-center text-accent-primary font-bold">
                         <Stethoscope className="w-5 h-5" />
                       </div>
-                      <p className="font-semibold text-accent-charcoal dark:text-white">{doctor.name}</p>
+                      <p className="font-semibold text-foreground">{doctor.name}</p>
                     </div>
                   </td>
                   <td className="py-4 px-6">
-                    <p className="text-gray-700 dark:text-gray-300 font-medium">{doctor.specialization}</p>
+                    <p className="text-muted font-medium">{doctor.specialization}</p>
                   </td>
                   <td className="py-4 px-6 text-right">
                     <button onClick={() => handleDeleteDoctor(doctor.id)} className="p-2 text-red-500 bg-red-50 hover:bg-red-500 hover:text-white rounded-lg transition-colors ml-auto">

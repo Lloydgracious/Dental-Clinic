@@ -1,0 +1,23 @@
+
+> dental-clinic-ui@0.1.0 predev
+> npm run clean
+
+
+> dental-clinic-ui@0.1.0 clean
+> node -e "require('fs').rmSync('.next', { recursive: true, force: true })"
+
+
+> dental-clinic-ui@0.1.0 dev
+> next dev
+
+   ▲ Next.js 14.1.4
+   - Local:        http://localhost:3000
+
+ ✓ Ready in 2.1s
+ ✓ Compiled /src/middleware in 342ms (70 modules)
+ ○ Compiling /login ...
+ ✓ Compiled /login in 4.8s (1526 modules)
+ ✓ Compiled in 496ms (655 modules)
+ ✓ Compiled / in 462ms (1534 modules)
+ ✓ Compiled /calendar in 337ms (1550 modules)
+ ✓ Compiled /patients in 366ms (1562 modules)

@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -18,6 +18,7 @@ export default function PatientsPage() {
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
   
   // Form Data
   const [formData, setFormData] = useState({
@@ -27,6 +28,28 @@ export default function PatientsPage() {
   // Patient List & Details State
   const [patients, setPatients] = useState<any[]>([]);
   const [selectedPatient, setSelectedPatient] = useState<any | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const search = params.get("search");
+      if (search) {
+        setSearchQuery(search);
+      }
+    }
+  }, []);
+
+  const filteredPatients = useMemo(() => {
+    if (!searchQuery) return patients;
+    const query = searchQuery.toLowerCase();
+    return patients.filter((p) => {
+      const fullName = `${p.firstName || ""} ${p.lastName || ""}`.toLowerCase();
+      const phone = (p.phone || "").toLowerCase();
+      const id = (p.id || "").toLowerCase();
+      return fullName.includes(query) || phone.includes(query) || id.includes(query);
+    });
+  }, [patients, searchQuery]);
 
   useEffect(() => {
     const q = query(collection(db, "patients"), orderBy("createdAt", "desc"));
@@ -104,15 +127,15 @@ export default function PatientsPage() {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-5xl mx-auto space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-accent-charcoal">Patients</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-accent-charcoal">Patients</h1>
           <p className="text-gray-500 mt-1">Manage your clinic's patient directory.</p>
         </div>
         
-        <div className="flex bg-gray-100 p-1 rounded-2xl w-max">
-          <button onClick={() => setActiveTab("list")} className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${activeTab === "list" ? "bg-white text-accent-charcoal shadow-sm" : "text-gray-500 hover:text-gray-700"}`}>
+        <div className="flex bg-gray-100 p-1 rounded-2xl w-full md:w-max">
+          <button onClick={() => setActiveTab("list")} className={`flex-1 md:flex-none px-4 py-2 rounded-xl text-sm font-medium transition-all ${activeTab === "list" ? "bg-white text-accent-charcoal shadow-sm" : "text-gray-500 hover:text-gray-700"}`}>
             Directory
           </button>
-          <button onClick={() => setActiveTab("register")} className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${activeTab === "register" ? "bg-white text-accent-charcoal shadow-sm" : "text-gray-500 hover:text-gray-700"}`}>
+          <button onClick={() => setActiveTab("register")} className={`flex-1 md:flex-none px-4 py-2 rounded-xl text-sm font-medium transition-all ${activeTab === "register" ? "bg-white text-accent-charcoal shadow-sm" : "text-gray-500 hover:text-gray-700"}`}>
             Register New
           </button>
         </div>
@@ -120,17 +143,23 @@ export default function PatientsPage() {
 
       {activeTab === "list" && (
         <Card className="p-0 overflow-hidden">
-          <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between bg-gray-50/50 dark:bg-gray-900/10">
-            <div className="relative w-72">
+          <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-gray-50/50 dark:bg-gray-900/10">
+            <div className="relative w-full sm:w-72">
                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-               <input type="text" placeholder="Search patients..." className="w-full pl-9 pr-4 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 transition-all font-sans dark:text-white" />
+               <input 
+                 type="text" 
+                 placeholder="Search patients..." 
+                 value={searchQuery}
+                 onChange={(e) => setSearchQuery(e.target.value)}
+                 className="w-full pl-9 pr-4 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:outline-none focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 transition-all font-sans dark:text-white" 
+               />
             </div>
-            <Button size="sm" onClick={() => setActiveTab("register")} className="gap-2">
+            <Button size="sm" onClick={() => setActiveTab("register")} className="gap-2 w-full sm:w-auto">
               <UserPlus className="w-4 h-4" />
               Add Patient
             </Button>
           </div>
-          <div className="overflow-x-auto">
+          <div className="hidden md:block overflow-x-auto">
              <table className="w-full text-left border-collapse">
                  <thead>
                    <tr className="bg-white dark:bg-surface-dark/20 border-b border-gray-100 dark:border-gray-800 text-sm text-gray-500">
@@ -140,9 +169,9 @@ export default function PatientsPage() {
                    </tr>
                  </thead>
                  <tbody className="divide-y divide-gray-50 dark:divide-gray-800 bg-white dark:bg-surface-dark/10 text-sm">
-                  {patients.length === 0 ? (
-                    <tr><td colSpan={3} className="py-8 text-center text-gray-500">No patients registered yet.</td></tr>
-                  ) : patients.map((patient) => (
+                  {filteredPatients.length === 0 ? (
+                    <tr><td colSpan={3} className="py-8 text-center text-gray-500">No patients found.</td></tr>
+                  ) : filteredPatients.map((patient) => (
                     <tr key={patient.id} className="hover:bg-gray-50/50 transition-colors group cursor-pointer" onClick={() => setSelectedPatient(patient)}>
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
@@ -170,8 +199,34 @@ export default function PatientsPage() {
                       </td>
                     </tr>
                   ))}
-                </tbody>
+                 </tbody>
              </table>
+          </div>
+          <div className="md:hidden divide-y divide-gray-100 bg-white">
+            {filteredPatients.length === 0 ? (
+              <div className="py-8 text-center text-gray-500">No patients found.</div>
+            ) : filteredPatients.map((patient) => (
+              <div key={patient.id} className="p-4 space-y-3" onClick={() => setSelectedPatient(patient)}>
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-full bg-accent-primary/10 flex items-center justify-center text-accent-primary font-bold">
+                    {patient.firstName[0]}{patient.lastName[0]}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-accent-charcoal truncate">{patient.firstName} {patient.lastName}</p>
+                    <p className="text-xs text-gray-400">ID: #{patient.id.slice(-4)}</p>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-600">{patient.phone}</p>
+                <div className="flex gap-2">
+                  <button onClick={(e) => { e.stopPropagation(); setSelectedPatient(patient); }} className="flex-1 p-2 text-accent-primary bg-blue-50 hover:bg-accent-primary hover:text-white rounded-lg transition-colors text-xs font-bold">
+                    View Details
+                  </button>
+                  <button onClick={(e) => { e.stopPropagation(); handleDeletePatient(patient.id); }} className="flex-1 p-2 text-red-500 bg-red-50 hover:bg-red-500 hover:text-white rounded-lg transition-colors text-xs font-bold">
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </Card>
       )}
@@ -190,7 +245,7 @@ export default function PatientsPage() {
                  </div>
               </div>
 
-               <div className="grid grid-cols-2 gap-4">
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-2xl border border-transparent dark:border-gray-800">
                      <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Phone Number</p>
                      <p className="font-semibold text-accent-charcoal dark:text-white">{selectedPatient.phone}</p>
@@ -224,11 +279,11 @@ export default function PatientsPage() {
 
       {activeTab === "register" && (
         <Card className="min-h-[500px] relative overflow-hidden bg-white dark:bg-surface-dark border-none shadow-2xl">
-          <div className="absolute top-0 left-0 right-0 px-8 pt-8 pb-4 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-surface-dark z-20">
-            <div className="flex items-center gap-4">
+          <div className="absolute top-0 left-0 right-0 px-4 sm:px-6 md:px-8 pt-6 md:pt-8 pb-4 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-surface-dark z-20">
+            <div className="flex items-center gap-2 md:gap-4">
               {STEPS.map((s, idx) => (
-                <div key={s} className="flex-1 flex items-center gap-4">
-                  <div className="flex items-center gap-3">
+                <div key={s} className="flex-1 flex items-center gap-2 md:gap-4">
+                  <div className="flex items-center gap-2 md:gap-3">
                     <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-colors ${step >= idx ? 'bg-accent-primary text-white shadow-lg' : 'bg-gray-100 dark:bg-gray-800 text-gray-400'}`}>
                       {idx + 1}
                     </span>
@@ -244,7 +299,7 @@ export default function PatientsPage() {
             </div>
           </div>
 
-          <div className="pt-28 pb-24 px-8 relative h-full">
+          <div className="pt-24 md:pt-28 pb-24 px-4 sm:px-6 md:px-8 relative h-full">
             <AnimatePresence initial={false} custom={direction} mode="wait">
               <motion.div
                 key={step}
@@ -261,7 +316,7 @@ export default function PatientsPage() {
                     <h2 className="text-2xl font-semibold mb-6 text-accent-charcoal dark:text-white">Personal Information</h2>
                        <Input name="firstName" value={formData.firstName} onChange={handleInputChange} label="First Name" placeholder="John" error={errors["firstName"]} className="dark:bg-gray-900 dark:border-gray-800" />
                        <Input name="lastName" value={formData.lastName} onChange={handleInputChange} label="Last Name" placeholder="Doe" error={errors["lastName"]} className="dark:bg-gray-900 dark:border-gray-800" />
-                       <div className="grid grid-cols-2 gap-4">
+                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <Input name="age" type="number" value={formData.age} onChange={handleInputChange} label="Age" placeholder="25" className="dark:bg-gray-900 dark:border-gray-800" />
                           <div className="flex flex-col gap-1.5 focus-within:z-10">
                             <label className="text-sm font-medium text-gray-600 dark:text-gray-400 ml-1">Sex</label>
@@ -312,11 +367,11 @@ export default function PatientsPage() {
             </AnimatePresence>
           </div>
 
-          <div className="absolute bottom-0 left-0 right-0 p-6 flex justify-between border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-surface-dark z-20">
+          <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 flex justify-between gap-3 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-surface-dark z-20">
             <Button variant="ghost" onClick={() => { setDirection(-1); setStep(s => s -1); }} disabled={step === 0 || step === STEPS.length - 1} className={step === 0 || step === STEPS.length - 1 ? "opacity-0 pointer-events-none" : ""}>
               Back
             </Button>
-            <Button variant={step === STEPS.length - 1 ? "secondary" : "primary"} onClick={step === STEPS.length - 1 ? resetForm : handleNext}>
+            <Button className="ml-auto" variant={step === STEPS.length - 1 ? "secondary" : "primary"} onClick={step === STEPS.length - 1 ? resetForm : handleNext}>
               {step === STEPS.length - 1 ? "Back to Directory" : "Continue"}
             </Button>
           </div>
